@@ -1,0 +1,14 @@
+applications:
+- command: npm start
+  disk_quota: 1G
+  domain: null
+  host: null
+  instances: 1
+  memory: 128MB
+  name: nodredwshp
+  routes:
+  - route: Lab0psh4.eu-gb.cf.appdomain.cloud
+  services:
+  - node-red-app-cloudant-1580722484242-67617
+  - node-red-app-cloudant-1580722484242
+  timeout: 180
