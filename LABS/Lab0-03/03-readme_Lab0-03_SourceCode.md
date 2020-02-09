@@ -231,8 +231,82 @@ internal/modules/cjs/loader.js:1021
 Щоб не передавати його в контейнер та git цей каталог потрібно додати в  так звані ignore-файли. Приклади файлів показані в
 **.gitignore**, **.dockerignore**, **.cfignore**.
 
+При цьому, якщо не конфігурувати env variables то система вважає, що потоки оброки зберігаються в локальному файлі
+
+```text
+PS C:\PSHDEV\PSH-WorkShops\IBM-Node-Red-APP2020\Lab0-02-app\nod-red-wshp> npm start
+> node-red-app@1.1.1 start C:\PSHDEV\PSH-WorkShops\IBM-Node-Red-APP2020\Lab0-02-app\nod-red-wshp
+> node --max-old-space-size=160 index.js --settings ./bluemix-settings.js -v
+
+9 Feb 13:35:03 - Starting Node-RED on IBM Cloud bootstrap
+9 Feb 13:35:03 - Loading bluemix-settings.js
+
+## !!!!!!!При старті вказано, що Cloudant не знайдений!!!!!!!
+9 Feb 13:35:03 - No Cloudant service found
+9 Feb 13:35:03 - Falling back to localfilesystem storage. Changes will *not* be saved across application restarts.
+## !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+9 Feb 13:35:03 - Loading application settings
+9 Feb 13:35:03 - Starting first-use setup
+9 Feb 13:35:03 - Waiting for first-use setup to complete
+```
+
+Правила визначення сховища потоків описані в bluemix-settings.js
+
+```js
+
+// Identify the Cloudant storage instance the application should be using.
+var storageServiceName;
+var storageServiceDetails;
 
 
+if (process.env.NODE_RED_STORAGE_NAME) {
+    // A service has been identifed by the NODE_RED_STORAGE_NAME env var.
+    //  - check to see if the named service exists
+    storageServiceDetails = appEnv.getService(process.env.NODE_RED_STORAGE_NAME);
+    if (!storageServiceDetails) {
+        util.log("Failed to find Cloudant service: "+process.env.NODE_RED_STORAGE_NAME+ " (NODE_RED_STORAGE_NAME)");
+    } else {
+        storageServiceName = process.env.NODE_RED_STORAGE_NAME
+    }
+} else {
+    // No couch service specified by env var - look at the attached services
+    var candidateServices = Object.values(appEnv.getServices()).filter(app => app.label === "cloudantNoSQLDB");
+    if (candidateServices.length === 0) {
+        util.log("No Cloudant service found");
+    } else {
+        // Use the first in the list - but warn if there are multiple incase we
+        // are using the 'wrong' one.
+        storageServiceName = candidateServices[0].name;
+        storageServiceDetails = candidateServices[0];
+        if (candidateServices.length > 1) {
+            util.log("Multiple Cloudant services found - using "+storageServiceName+". Use NODE_RED_STORAGE_NAME env var to specify the required instance.");
+        }
+    }
+}
+
+if (!storageServiceName) {
+    // No suitable service has been found. Fall back to localfilesystem storage
+    util.log("Falling back to localfilesystem storage. Changes will *not* be saved across application restarts.");
+} else {
+    // Set the Cloudant storage module settings
+    settings.cloudantService = {
+        // The name of the service instance to use.
+        name: storageServiceName,
+        // The URL to use
+        url: storageServiceDetails.credentials.url,
+        // The name of the database to use
+        db: process.env.NODE_RED_STORAGE_DB_NAME || _sanitizeAppName(appEnv.name),
+        // The prefix for all document names stored by this instance.
+        prefix: process.env.NODE_RED_STORAGE_APP_NAME || _sanitizeAppName(appEnv.name)
+    }
+
+    util.log("Using Cloudant service: "+storageServiceName+" db:"+settings.cloudantService.db+" prefix:"+settings.cloudantService.prefix);
+    settings.storageModule = require("./cloudantStorage");
+}
+
+
+```
 
 
 <a name="p7"></a>
