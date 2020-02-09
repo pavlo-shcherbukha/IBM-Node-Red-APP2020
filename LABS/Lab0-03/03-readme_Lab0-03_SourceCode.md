@@ -231,7 +231,7 @@ internal/modules/cjs/loader.js:1021
 Щоб не передавати його в контейнер та git цей каталог потрібно додати в  так звані ignore-файли. Приклади файлів показані в
 **.gitignore**, **.dockerignore**, **.cfignore**.
 
-При цьому, якщо не конфігурувати env variables то система вважає, що потоки оброки зберігаються в локальному файлі
+При цьому, якщо не конфігурувати env variables то система вважає, що потоки обробки зберігаються в локальному файлі
 
 ```text
 PS C:\PSHDEV\PSH-WorkShops\IBM-Node-Red-APP2020\Lab0-02-app\nod-red-wshp> npm start
@@ -304,9 +304,57 @@ if (!storageServiceName) {
     util.log("Using Cloudant service: "+storageServiceName+" db:"+settings.cloudantService.db+" prefix:"+settings.cloudantService.prefix);
     settings.storageModule = require("./cloudantStorage");
 }
-
-
 ```
+
+При старті локально з файловим сховищем потоки, що задеплоєні зберігаються в файлі:
+
+```bash
+   .node-red/flows.json
+   .node-red/flows_cred.json
+```
+При цьому, з каталога **default** потоки не переносяться.
+Крім того, потрібно мати на увазі, що при локальному старті перевіряються тільки логін та пароль і стартує звичайна стандартна NodeRed біблиотека: **require('./node_modules/node-red/red.js');**
+
+Ось цитата з **index.js**
+
+```js
+    function startNodeRED(config) {
+        if (config.adminAuth && !settings.adminAuth) {
+            util.log("Enabling adminAuth security - set NODE_RED_USERNAME and NODE_RED_PASSWORD to change credentials");
+            settings.adminAuth = {
+                type: "credentials",
+                users: function (username) {
+                    if (config.adminAuth.username == username) {
+                        return Promise.resolve({ username: username, permissions: "*" });
+                    } else {
+                        return Promise.resolve(null);
+                    }
+                },
+                authenticate: function (username, password) {
+                    if (config.adminAuth.username === username && bcrypt.compareSync(password, config.adminAuth.password)) {
+                        return Promise.resolve({ username: username, permissions: "*" });
+                    } else {
+                        return Promise.resolve(null);
+                    }
+                }
+            };
+            if ((process.env.NODE_RED_GUEST_ACCESS === 'true') || (process.env.NODE_RED_GUEST_ACCESS === undefined && config.adminAuth.allowAnonymous)) {
+                util.log("Enabling anonymous read-only access - set NODE_RED_GUEST_ACCESS to 'false' to disable");
+                settings.adminAuth.default = function () {
+                    return Promise.resolve({ anonymous: true, permissions: "read" });
+                };
+            } else {
+                util.log("Disabled anonymous read-only access - set NODE_RED_GUEST_ACCESS to 'true' to enable");
+            }
+        }
+        require('./node_modules/node-red/red.js');
+    }
+```
+
+Тобто практично, стартує не залежний екземпляр Node-RED у вигляді бібліотеки.
+Але є 2 практичні користі:
+- Спільні бібліотеки
+- можливість переноса потоку під управління git і потім його доставка в хмару.
 
 
 <a name="p7"></a>
