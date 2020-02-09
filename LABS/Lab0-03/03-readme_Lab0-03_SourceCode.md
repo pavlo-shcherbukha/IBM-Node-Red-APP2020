@@ -10,17 +10,16 @@
 
 - 3 [Призначення файлів в кореневому каталозі](#p3)
 
-- 4 [Запуск нашого app локально](#p4)
+- 4 [Запуск нашого app локально з Node.Js під локальною ОС](#p4)
 
-- 5 [Р](#p5)
+- 5 [Запуск нашого app локально в контейнері](#p5)
 
-- 6 [Р](#p6) 
+- 6 [ Анатомія локального запуску](#p6) 
 
-- 7 [D](#p7) 
+- 7 [Deployent з допомогою IBM Cloud CLI](#p7) 
 
-<!-- TOC END -->
 
-<a name="p1"></a>
+
 ## Вступ
 
 Документація написана з використанням загадльно-прийнятого формату markdown (файли  типу *.md). Короткий довідник по markdown знаходиться по лінку [markdown help](https://gist.github.com/MinhasKamal/7fdebb7c424d23149140).
@@ -31,7 +30,7 @@
 ## Призначення каталогів
 
 - **defaults**
-Тут розміщуєтья файл з наперед розролеими потоками обробки
+Тут розміщуєтья файл з наперед розробленими потоками обробки
 з найменуванням **flow.json**. Якщо маємо кореспондуючий файл з credentials, то їх розміщують ту же в файлі **flow_cred.json**.
 defaults/readme.md
 
@@ -125,15 +124,16 @@ module.exports = function (app) {
 Конфігурація cloudFoundry application при deployment.
 
 - **cli-config.yml**
-Конфігурація ibmCloud CLI
+Конфігурація ibmCloud CLI. До речі дуже цікавий файл. Потрібно з ним розібратися детальніше.
 
 - **run-debug**
 Для запуску в режимі remote debug
-(не працює, здається переїхав з минулої вресії node.js app)
+(не працює, здається переїхав з минулої вресії node.js app шаблону).
+Дуже схоже, що зараз його функції виконує **cli-config.yml**
 
 - **run-dev**
 Для запуску в режимі розроника
-(не працює, здається переїхав з минулої вресії node.js app) 
+(не працює, здається переїхав з минулої вресії node.js app шаблону). Дуже схоже, що зараз його функції виконує **cli-config.yml** 
 
 - **README.md**
 описовий
@@ -167,14 +167,18 @@ module.exports = function (app) {
 ```bash
   node --max-old-space-size=160 index.js --settings ./bluemix-settings.js -v
 ```
+При цьому application буде доступне по http://localhost:1880/
 
-- Запуск в Docker контейнері
+
+<a name="p5"></a>
+## Запуск нашого app локально в Docker контейнері
 
 Запуск в docker контенері ділиться на 2 етапи
 Спершу створюється образ операційного середовища, описаний в файлі: Dockerfile-tools 
-Потім уже створюється новий образ шляхом копіювання app кода.
+Потім уже створюється новий образ шляхом копіювання app кода. Взято від шаблону звичайного node.js app
 
 **Побудова базовго образа**
+(чомусь перестало працювати. Є підозра в сумісності версій Node)
 
 ```bash
   ibmcloud dev build
@@ -185,48 +189,49 @@ module.exports = function (app) {
 ```bash
   ibmcloud dev run
 ```
+
 В каталозі from-rhat-img  дежать Docker файлы для запуска контейнерів та образи від RHat
 В каталозі from-rhat-img  Docker файли з node:10-stretch
 
-Якщо команди не спрацьовують то можна використати прямі докер команди
-
-```
-docker image build --file Dockerfile-tools --tag nodredwshp-express-tools --rm --pull --build-arg bx_dev_userid=0 --build-arg bx_dev_user=root .
-
-docker image build --file Dockerfile --tag nodredwshp-express-run --rm --pull --build-arg bx_dev_userid=0 --build-arg bx_dev_user=root .
-
-docker run -p 3000 nodredwshp-express-run
-
-```
-
-
-
-
-
-
-This will launch your application locally. When you are ready to deploy to IBM Cloud on Cloud Foundry or Kubernetes, run one of the following commands:
+Якщо команди не спрацьовують, то дають таку помилку 
 
 ```bash
-ibmcloud dev deploy -t buildpack // to Cloud Foundry
-ibmcloud dev deploy -t container // to K8s cluster
+Logs for the nodredwshp-express-run container:
+
+> node-red-app@1.1.1 start /app
+> node --max-old-space-size=160 index.js --settings ./bluemix-settings.js -v
+internal/modules/cjs/loader.js:1021
+  return process.dlopen(module, path.toNamespacedPath(filename));
+                 ^Error: /app/node_modules/bcrypt/lib/binding/bcrypt_lib.node: invalid ELF header
 ```
 
-You can build and debug your app locally with:
+то можна використати прямі докер команди
 
-```bash
-ibmcloud dev build --debug
-ibmcloud dev debug
 ```
+    ## similar Dockerfile-tools
+    docker image build --file Dockerfile-tools --tag nodredwshp-express-tools --rm --pull --build-arg bx_dev_userid=0 --build-arg bx_dev_user=root .
 
+   ## similar Dockerfile
+   docker image build --file Dockerfile --tag nodredwshp-express-run --rm --pull --build-arg bx_dev_userid=0 --build-arg bx_dev_user=root .
 
+   ## run container
+   docker run -p 1880:1880б -p3000:3000 nodredwshp-express-run
 
-
-<a name="p5"></a>
-## Робота з IBM Cloud git. Додаткові настройки Git
-
+```
 
 <a name="p6"></a>
-## Робота з IBM Cloud git. Змінити код та відпавити його знову в IBM Cloud 
+## Анатомія локального запуску 
+
+Якщо Node-RED стартує локально, то сворює каталог
+
+```bash
+   .node-red
+```
+
+Щоб не передавати його в контейнер та git цей каталог потрібно додати в  так звані ignore-файли. Приклади файлів показані в
+**.gitignore**, **.dockerignore**, **.cfignore**.
+
+
 
 
 
