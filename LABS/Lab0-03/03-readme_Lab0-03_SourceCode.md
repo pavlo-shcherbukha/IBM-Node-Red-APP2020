@@ -10,7 +10,7 @@
 
 - 3 [Призначення файлів в кореневому каталозі](#p3)
 
-- 4 [Р](#p4)
+- 4 [Запуск нашого app локально](#p4)
 
 - 5 [Р](#p5)
 
@@ -101,14 +101,6 @@ module.exports = function (app) {
 Доступ з файла: "file:/server/localdev-config.json:$.cloudant_url
 В хмарі CloudFoundry параметр вичитується з "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.url"
 
-
-
-
-<kbd><img src="doc/lab-02-pic6.png"/></kbd>
-
-<kbd><img src="doc/lab-02-pic7.png"/></kbd>
-
-
 <a name="p3"></a>
 ## Призначення файлів в кореневому каталозі
 
@@ -157,7 +149,75 @@ module.exports = function (app) {
 
 
 <a name="p4"></a>
-## Робота з IBM Cloud git. Клонування репозиторію на локальну станцію
+## Запуск нашого app локально:
+
+Існує 2 варианту запуску нашого app локально
+- традиційний і класичний спосіб, використовуючи команду
+
+```bash
+
+   npm install
+
+   npm start
+
+```
+
+Цей скрипт запускає команду:
+
+```bash
+  node --max-old-space-size=160 index.js --settings ./bluemix-settings.js -v
+```
+
+- Запуск в Docker контейнері
+
+Запуск в docker контенері ділиться на 2 етапи
+Спершу створюється образ операційного середовища, описаний в файлі: Dockerfile-tools 
+Потім уже створюється новий образ шляхом копіювання app кода.
+
+**Побудова базовго образа**
+
+```bash
+  ibmcloud dev build
+```
+
+**Створюється контейнер з прикладним кодом**
+
+```bash
+  ibmcloud dev run
+```
+В каталозі from-rhat-img  дежать Docker файлы для запуска контейнерів та образи від RHat
+В каталозі from-rhat-img  Docker файли з node:10-stretch
+
+Якщо команди не спрацьовують то можна використати прямі докер команди
+
+```
+docker image build --file Dockerfile-tools --tag nodredwshp-express-tools --rm --pull --build-arg bx_dev_userid=0 --build-arg bx_dev_user=root .
+
+docker image build --file Dockerfile --tag nodredwshp-express-run --rm --pull --build-arg bx_dev_userid=0 --build-arg bx_dev_user=root .
+
+docker run -p 3000 nodredwshp-express-run
+
+```
+
+
+
+
+
+
+This will launch your application locally. When you are ready to deploy to IBM Cloud on Cloud Foundry or Kubernetes, run one of the following commands:
+
+```bash
+ibmcloud dev deploy -t buildpack // to Cloud Foundry
+ibmcloud dev deploy -t container // to K8s cluster
+```
+
+You can build and debug your app locally with:
+
+```bash
+ibmcloud dev build --debug
+ibmcloud dev debug
+```
+
 
 
 
@@ -172,4 +232,9 @@ module.exports = function (app) {
 
 <a name="p7"></a>
 ## Deployent з допомогою IBM Cloud CLI
+
+<kbd><img src="doc/lab-02-pic6.png"/></kbd>
+
+<kbd><img src="doc/lab-02-pic7.png"/></kbd>
+
 
