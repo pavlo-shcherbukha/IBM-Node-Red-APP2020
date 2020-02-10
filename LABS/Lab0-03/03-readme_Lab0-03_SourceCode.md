@@ -191,9 +191,9 @@ module.exports = function (app) {
 ```
 
 В каталозі from-rhat-img  дежать Docker файлы для запуска контейнерів та образи від RHat
-В каталозі from-rhat-img  Docker файли з node:10-stretch
+В каталозі from-node10stretch-img Docker файли з node:10-stretch
 
-Якщо команди не спрацьовують, то дають таку помилку 
+Якщо команди не спрацьовують, то дають помилку як показано нижче, 
 
 ```bash
 Logs for the nodredwshp-express-run container:
