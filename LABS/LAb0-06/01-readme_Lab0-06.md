@@ -33,3 +33,38 @@
 Кожна новина записується окремо в БД  Cloudant: Заголовок новини і вкладення. Документ БД  виглядає таким чином:
 
 <kbd><img src="doc/pic-3.png"></kbd>
+
+## Загрузка XML rss  в БД CLoudant
+
+Це потік дозволяє прочитати задану користувачем rss-стрічку, та записати її як attachment у вигляді великого json файлу.
+<kbd><img src="doc/pic-4.png"></kbd>
+
+Пртік приймає на вхід URL  та найменування RSS-  стрічки, та повертає реквізити документу, створеного в БД Cloudant.
+
+
+- Запит
+method: http-post
+
+url=https://nod-red-wshp.eu-gb.mybluemix.net/rssup
+
+Request:
+```json
+{ 
+    "rss_url": "https://censor.net.ua/includes/news_en.xml",
+    "rss_name": "Censor all news"
+
+}
+```
+
+
+Response:
+Реквізити створеного в БД документу
+
+```json
+{
+  "ok": true,
+  "id": "4ca31f32b13a48b31e58bcf2288ca697",
+  "rev": "1-9819141a3a07c1ea1805112b26532cdf"
+}
+
+```

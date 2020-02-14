@@ -42,6 +42,7 @@
         msg.payload.rss=rss
      //  ----------------
         node.send(msg);
+        node.done();
     });
     // ---------------
     return ;
