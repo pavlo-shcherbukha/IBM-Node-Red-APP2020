@@ -2,6 +2,9 @@
 
 ## Приклад сервісу, що забезпечує аналіз rss-стрічки новин, та хапис новин в БД для подальшого аналізу.
 
+У файлі: [Flows/flow-1-RSS-SRVC-UPLOADER.json ](Flows/flow-1-RSS-SRVC-UPLOADER.json)
+
+
 ### Бібліотеки, що потрібні для роботи
 
 "node-red-contrib-cloudantplus-selector": "^0.1.4",
@@ -37,6 +40,8 @@
 ## Загрузка XML rss  в БД CLoudant
 
 Це потік дозволяє прочитати задану користувачем rss-стрічку, та записати її як attachment у вигляді великого json файлу.
+
+У файлі: [Flows/flow-2-rss-file-uploader.json](Flows/flow-2-rss-file-uploader.json)
 <kbd><img src="doc/pic-4.png"></kbd>
 
 Пртік приймає на вхід URL  та найменування RSS-  стрічки, та повертає реквізити документу, створеного в БД Cloudant.
