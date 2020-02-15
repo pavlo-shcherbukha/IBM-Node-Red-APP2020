@@ -1,6 +1,5 @@
 # IBM Node-RED IBM Cloud template 2020. Запуск локально
-
-# LAB-0-02 - getting source code
+# LAB-0-03 - Запуск хмарного шаблону локально 
 
 
 <!-- TOC BEGIN -->
@@ -16,7 +15,7 @@
 
 - 6 [ Анатомія локального запуску](#p6) 
 
-- 7 [Deployent з допомогою IBM Cloud CLI](#p7) 
+
 
 
 
@@ -355,13 +354,3 @@ if (!storageServiceName) {
 Але є 2 практичні користі:
 - Спільні бібліотеки
 - можливість переноса потоку під управління git і потім його доставка в хмару.
-
-
-<a name="p7"></a>
-## Deployent з допомогою IBM Cloud CLI
-
-<kbd><img src="doc/lab-02-pic6.png"/></kbd>
-
-<kbd><img src="doc/lab-02-pic7.png"/></kbd>
-
-
