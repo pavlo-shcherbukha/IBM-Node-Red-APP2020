@@ -133,3 +133,37 @@ return ;
 
 ```
 
+```text
+
+Common examples Content-Type
+
+    application/javascript
+    application/json
+    application/x-www-form-urlencoded
+    application/xml
+    application/zip
+    application/pdf
+    application/sql
+    application/graphql
+    application/ld+json
+    application/msword (.doc)
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document(.docx)
+    application/vnd.ms-excel (.xls)
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet (.xlsx)
+    application/vnd.ms-powerpoint (.ppt)
+    application/vnd.openxmlformats-officedocument.presentationml.presentation (.pptx)
+    application/vnd.oasis.opendocument.text (.odt)
+    application/zstd (.zst)
+    audio/mpeg
+    audio/ogg
+    multipart/form-data
+    text/css
+    text/html
+    text/xml
+    text/csv
+    text/plain
+    image/png
+    image/jpeg
+    image/gif
+    application/vnd.api+json
+```
